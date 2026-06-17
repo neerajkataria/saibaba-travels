@@ -1,0 +1,2049 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Saibaba Travels — Internal Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --saffron: #f97316;
+  --saffron-dark: #c2410c;
+  --saffron-light: #fed7aa;
+  --bg: #0d0d0d;
+  --bg2: #161616;
+  --bg3: #1e1e1e;
+  --bg4: #262626;
+  --border: #2e2e2e;
+  --border2: #3a3a3a;
+  --text: #f0f0f0;
+  --text2: #a0a0a0;
+  --text3: #6b6b6b;
+  --green: #22c55e;
+  --green-bg: #14532d22;
+  --red: #ef4444;
+  --red-bg: #450a0a22;
+  --blue: #3b82f6;
+  --blue-bg: #1e3a5f22;
+  --amber: #f59e0b;
+  --amber-bg: #451a0322;
+  --purple: #a855f7;
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo .brand {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--saffron);
+  letter-spacing: 0.3px;
+}
+
+.sidebar-logo .sub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.nav-section {
+  padding: 12px 8px 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  padding-left: 14px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 1px 8px;
+  font-size: 14px;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--saffron)18; color: var(--saffron); }
+.nav-item .icon { font-size: 17px; width: 20px; text-align: center; }
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text3);
+  text-align: center;
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  margin-left: 220px;
+  flex: 1;
+  min-height: 100vh;
+}
+
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.page-title { font-size: 17px; font-weight: 600; }
+.page-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary { background: var(--saffron); color: white; }
+.btn-primary:hover { background: var(--saffron-dark); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover { background: var(--bg3); color: var(--text); }
+.btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid #450a0a; }
+.btn-danger:hover { background: #450a0a; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-icon { padding: 7px; width: 34px; height: 34px; justify-content: center; }
+
+.content { padding: 24px; }
+
+/* ── CARDS & LAYOUT ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+}
+
+.stat-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 28px; font-weight: 700; color: var(--text); margin-top: 4px; }
+.stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* ── TABLES ── */
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tbody tr:hover { background: var(--bg3); }
+tbody tr:last-child td { border-bottom: none; }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.badge-green { background: var(--green-bg); color: var(--green); border: 1px solid #14532d44; }
+.badge-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid #45180344; }
+.badge-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid #1e3a5f44; }
+.badge-red { background: var(--red-bg); color: var(--red); border: 1px solid #450a0a44; }
+.badge-purple { background: #3b0764; color: var(--purple); border: 1px solid #581c8744; }
+.badge-saffron { background: #431407; color: var(--saffron); border: 1px solid #7c2d1244; }
+
+/* ── FORMS ── */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--saffron);
+}
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-select option { background: var(--bg3); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+/* ── SEARCH ── */
+.search-wrap { position: relative; }
+.search-wrap input { padding-left: 36px; }
+.search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 15px;
+  pointer-events: none;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+  z-index: 1;
+}
+.modal-title { font-size: 16px; font-weight: 600; }
+.modal-body { padding: 20px 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tab {
+  padding: 10px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text3);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+}
+.tab:hover { color: var(--text2); }
+.tab.active { color: var(--saffron); border-bottom-color: var(--saffron); }
+
+/* ── VENDOR CARD (grid view) ── */
+.vendor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.vendor-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.vendor-card:hover { border-color: var(--saffron)66; transform: translateY(-1px); }
+.vendor-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.vendor-name { font-size: 14px; font-weight: 600; }
+.vendor-city { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.vendor-phone { font-size: 13px; color: var(--text2); margin-top: 8px; }
+.vendor-rate { margin-top: 10px; font-size: 13px; }
+.rate-cost { color: var(--text3); }
+.rate-sell { color: var(--green); font-weight: 600; font-size: 15px; }
+
+/* ── ITINERARY BUILDER ── */
+.itin-day {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.itin-day-header {
+  background: var(--bg3);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.day-label { font-size: 13px; font-weight: 600; color: var(--saffron); }
+.day-title { font-size: 13px; color: var(--text2); }
+
+.itin-drop-zone {
+  min-height: 80px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.itin-drop-zone.drag-over {
+  background: var(--saffron)08;
+  border: 2px dashed var(--saffron)44;
+  border-radius: 8px;
+}
+.drop-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  color: var(--text3);
+  font-size: 13px;
+  border: 1px dashed var(--border2);
+  border-radius: 8px;
+}
+
+.itin-item {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: grab;
+  transition: all 0.1s;
+}
+.itin-item:hover { border-color: var(--saffron)44; }
+.itin-item.dragging { opacity: 0.5; cursor: grabbing; }
+.item-icon { font-size: 18px; width: 28px; text-align: center; }
+.item-info { flex: 1; }
+.item-name { font-size: 13px; font-weight: 500; }
+.item-detail { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.item-price { font-size: 13px; font-weight: 600; color: var(--green); white-space: nowrap; }
+.item-remove { color: var(--text3); cursor: pointer; padding: 4px; border-radius: 4px; }
+.item-remove:hover { color: var(--red); background: var(--red-bg); }
+
+/* ── SIDEBAR PANEL (vendor picker) ── */
+.builder-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+.vendor-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.vendor-panel-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  position: sticky;
+  top: 0;
+  background: var(--bg2);
+}
+.draggable-vendor {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: grab;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  transition: background 0.1s;
+  font-size: 13px;
+}
+.draggable-vendor:hover { background: var(--bg3); }
+.draggable-vendor:active { cursor: grabbing; }
+.dv-icon { font-size: 16px; }
+.dv-info .dv-name { font-weight: 500; }
+.dv-info .dv-sub { font-size: 11px; color: var(--text3); }
+
+/* ── TOAST ── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 13px;
+  box-shadow: var(--shadow);
+  animation: slideIn 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 320px;
+}
+.toast.success { border-color: #14532d; }
+.toast.error { border-color: #450a0a; }
+@keyframes slideIn { from { transform: translateX(40px); opacity:0; } to { transform: translateX(0); opacity:1; } }
+
+/* ── SETUP SCREEN ── */
+.setup-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 20px;
+}
+.setup-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+}
+.setup-logo { font-size: 48px; margin-bottom: 16px; }
+.setup-title { font-size: 22px; font-weight: 700; color: var(--saffron); margin-bottom: 6px; }
+.setup-sub { font-size: 14px; color: var(--text3); margin-bottom: 32px; }
+
+/* ── ITINERARY PRINT ── */
+@media print {
+  .sidebar, .topbar, .topbar-actions, .no-print { display: none !important; }
+  .main { margin-left: 0; }
+  body { background: white; color: black; }
+  .print-itinerary { display: block !important; }
+}
+
+.print-itinerary { display: none; }
+
+/* ── LOADING ── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  color: var(--text3);
+  font-size: 14px;
+  gap: 10px;
+}
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--saffron);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── EMPTY STATE ── */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-title { font-size: 15px; color: var(--text2); margin-bottom: 6px; }
+.empty-sub { font-size: 13px; }
+
+/* ── MARKUP CALC ── */
+.markup-display {
+  background: var(--bg3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text2);
+}
+.markup-display .sell { color: var(--green); font-size: 18px; font-weight: 700; }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.filter-select {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+.filter-select:focus { border-color: var(--saffron); }
+
+/* ── STATUS COLORS ── */
+.status-draft { color: var(--text3); }
+.status-sent { color: var(--blue); }
+.status-confirmed { color: var(--green); }
+.status-cancelled { color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- SETUP SCREEN (shown until Supabase connected) -->
+<div class="setup-screen" id="setupScreen" style="display:none">
+  <div class="setup-card">
+    <div class="setup-logo">🕉️</div>
+    <div class="setup-title">Saibaba Travels</div>
+    <div class="setup-sub">Enter your Supabase credentials to connect</div>
+    <div class="form-group" style="text-align:left">
+      <label class="form-label">Supabase Project URL</label>
+      <input class="form-input" id="setupUrl" placeholder="https://xxxx.supabase.co" />
+    </div>
+    <div class="form-group" style="text-align:left">
+      <label class="form-label">Publishable Key</label>
+      <input class="form-input" id="setupKey" placeholder="sb_publishable_..." />
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="connectSupabase()">Connect & Launch →</button>
+    <div id="setupError" style="color:var(--red);font-size:13px;margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none; width:100%; display:none">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">🕉️ Saibaba Travels</div>
+    <div class="sub">Internal Portal</div>
+  </div>
+  <div style="flex:1; overflow-y:auto; padding-top:8px">
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+      <span class="icon">◈</span> Dashboard
+    </div>
+    <div class="nav-section">Vendors</div>
+    <div class="nav-item" onclick="navigate('hotels')" id="nav-hotels">
+      <span class="icon">🏨</span> Hotels
+    </div>
+    <div class="nav-item" onclick="navigate('taxis')" id="nav-taxis">
+      <span class="icon">🚗</span> Taxis & Transport
+    </div>
+    <div class="nav-item" onclick="navigate('activities')" id="nav-activities">
+      <span class="icon">🎯</span> Activities
+    </div>
+    <div class="nav-section">Itineraries</div>
+    <div class="nav-item" onclick="navigate('itineraries')" id="nav-itineraries">
+      <span class="icon">🗺️</span> All Itineraries
+    </div>
+    <div class="nav-item" onclick="navigate('builder')" id="nav-builder">
+      <span class="icon">✏️</span> Builder
+    </div>
+    <div class="nav-section">Settings</div>
+    <div class="nav-item" onclick="navigate('markup')" id="nav-markup">
+      <span class="icon">💰</span> Markup Rules
+    </div>
+  </div>
+  <div class="sidebar-bottom">v1.0 · Free Plan</div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <div id="pageContent"></div>
+</main>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModalOutside(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// SUPABASE SETUP
+// ══════════════════════════════════════════
+const SUPABASE_URL = 'https://rkdkrvzqghfipseoesfi.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Rz2rxKj6fSo1a2z4RNquLQ_9RkLJwrV';
+
+let sb;
+let currentPage = 'dashboard';
+let currentItinerary = null;
+let draggedVendor = null;
+
+async function init() {
+  try {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // test connection
+    const { error } = await sb.from('hotels').select('id').limit(1);
+    if (error && error.code === '42P01') {
+      // Tables don't exist yet — run setup
+      await runDatabaseSetup();
+    }
+    document.getElementById('app').style.display = 'flex';
+    navigate('dashboard');
+  } catch(e) {
+    document.getElementById('setupScreen').style.display = 'flex';
+  }
+}
+
+async function runDatabaseSetup() {
+  // Tables need to be created — Supabase free tier requires SQL Editor
+  // We'll show instructions
+  toast('First run! Please run the SQL setup via Supabase SQL Editor.', 'error');
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  
+  const pages = {
+    dashboard: renderDashboard,
+    hotels: renderHotels,
+    taxis: renderTaxis,
+    activities: renderActivities,
+    itineraries: renderItineraries,
+    builder: renderBuilder,
+    markup: renderMarkup,
+  };
+  if (pages[page]) pages[page]();
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ══════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════
+function openModal(title, body, footer = '') {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalFooter').innerHTML = footer;
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function selling(cost, markup) {
+  return cost * (1 + markup / 100);
+}
+function fmtINR(n) {
+  if (!n && n !== 0) return '—';
+  return '₹' + Number(n).toLocaleString('en-IN', {maximumFractionDigits: 0});
+}
+function catBadge(cat) {
+  const map = {
+    'Budget': 'badge-blue', 'Standard': 'badge-blue',
+    'Deluxe': 'badge-amber', 'Luxury': 'badge-purple', 'Heritage': 'badge-saffron',
+    'Religious': 'badge-saffron', 'Cultural': 'badge-blue',
+    'Adventure': 'badge-green', 'Food': 'badge-amber', 'Wellness': 'badge-purple',
+    'Sightseeing': 'badge-blue', 'Shopping': 'badge-green', 'Other': 'badge-blue',
+  };
+  return `<span class="badge ${map[cat] || 'badge-blue'}">${cat}</span>`;
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════
+async function renderDashboard() {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="topbar">
+      <div><div class="page-title">🕉️ Dashboard</div><div class="page-sub">Welcome to Saibaba Travels Portal</div></div>
+    </div>
+    <div class="content" id="dashContent">
+      <div class="loading"><div class="spinner"></div> Loading...</div>
+    </div>`;
+
+  const [hotels, taxis, activities, itins] = await Promise.all([
+    sb.from('hotels').select('id,is_active').then(r => r.data || []),
+    sb.from('taxis').select('id,is_active').then(r => r.data || []),
+    sb.from('activities').select('id,is_active').then(r => r.data || []),
+    sb.from('itineraries').select('id,status,total_selling').then(r => r.data || []),
+  ]);
+
+  const confirmed = itins.filter(i => i.status === 'Confirmed');
+  const revenue = confirmed.reduce((s, i) => s + (i.total_selling || 0), 0);
+
+  document.getElementById('dashContent').innerHTML = `
+    <div class="grid-4" style="margin-bottom:24px">
+      <div class="stat-card">
+        <div class="stat-label">🏨 Hotels</div>
+        <div class="stat-value">${hotels.length}</div>
+        <div class="stat-sub">${hotels.filter(h=>h.is_active).length} active vendors</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🚗 Taxis</div>
+        <div class="stat-value">${taxis.length}</div>
+        <div class="stat-sub">${taxis.filter(t=>t.is_active).length} active vendors</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🎯 Activities</div>
+        <div class="stat-value">${activities.length}</div>
+        <div class="stat-sub">${activities.filter(a=>a.is_active).length} active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🗺️ Itineraries</div>
+        <div class="stat-value">${itins.length}</div>
+        <div class="stat-sub">${confirmed.length} confirmed · ${fmtINR(revenue)}</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">Quick Actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primary" onclick="navigate('hotels');setTimeout(()=>openAddHotel(),100)">🏨 Add Hotel Vendor</button>
+          <button class="btn btn-ghost" onclick="navigate('taxis');setTimeout(()=>openAddTaxi(),100)">🚗 Add Taxi Vendor</button>
+          <button class="btn btn-ghost" onclick="navigate('activities');setTimeout(()=>openAddActivity(),100)">🎯 Add Activity</button>
+          <button class="btn btn-ghost" onclick="navigate('itineraries');setTimeout(()=>openAddItinerary(),100)">🗺️ New Itinerary</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">Recent Itineraries</div>
+        ${itins.length === 0 ? '<div class="empty"><div class="empty-icon">🗺️</div><div class="empty-title">No itineraries yet</div></div>' :
+          itins.slice(0,5).map(i => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+              <span style="color:var(--text2)">${i.id.slice(0,8)}...</span>
+              <span class="badge badge-${i.status==='Confirmed'?'green':i.status==='Sent'?'blue':i.status==='Cancelled'?'red':'blue'}">${i.status}</span>
+            </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+// HOTELS
+// ══════════════════════════════════════════
+async function renderHotels() {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="topbar">
+      <div><div class="page-title">🏨 Hotels & Accommodation</div><div class="page-sub">All your hotel vendor contacts</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openAddHotel()">+ Add Hotel</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="filter-bar">
+        <div class="search-wrap" style="flex:1;max-width:300px">
+          <span class="search-icon">🔍</span>
+          <input class="form-input" id="hotelSearch" placeholder="Search hotels, cities..." oninput="filterHotels()" style="padding-left:36px" />
+        </div>
+        <select class="filter-select" id="hotelCat" onchange="filterHotels()">
+          <option value="">All Categories</option>
+          <option>Budget</option><option>Standard</option><option>Deluxe</option><option>Luxury</option><option>Heritage</option>
+        </select>
+        <select class="filter-select" id="hotelState" onchange="filterHotels()">
+          <option value="">All States</option>
+          <option>Maharashtra</option><option>Goa</option><option>Rajasthan</option><option>Kerala</option><option>Gujarat</option><option>Karnataka</option><option>Tamil Nadu</option>
+        </select>
+      </div>
+      <div id="hotelList"><div class="loading"><div class="spinner"></div> Loading hotels...</div></div>
+    </div>`;
+  
+  await loadHotels();
+}
+
+let allHotels = [];
+async function loadHotels() {
+  const { data, error } = await sb.from('hotels').select('*').order('created_at', { ascending: false });
+  if (error) { toast('Failed to load hotels', 'error'); return; }
+  allHotels = data || [];
+  filterHotels();
+}
+
+function filterHotels() {
+  const q = (document.getElementById('hotelSearch')?.value || '').toLowerCase();
+  const cat = document.getElementById('hotelCat')?.value || '';
+  const state = document.getElementById('hotelState')?.value || '';
+  let filtered = allHotels.filter(h => {
+    const matchQ = !q || h.name?.toLowerCase().includes(q) || h.city?.toLowerCase().includes(q) || h.contact_person?.toLowerCase().includes(q);
+    const matchCat = !cat || h.category === cat;
+    const matchState = !state || h.state === state;
+    return matchQ && matchCat && matchState;
+  });
+  renderHotelList(filtered);
+}
+
+function renderHotelList(hotels) {
+  const el = document.getElementById('hotelList');
+  if (!el) return;
+  if (hotels.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🏨</div><div class="empty-title">No hotels found</div><div class="empty-sub">Add your first hotel vendor</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="vendor-grid">${hotels.map(h => `
+    <div class="vendor-card" onclick="viewHotel('${h.id}')">
+      <div class="vendor-card-top">
+        <div>
+          <div class="vendor-name">${h.name}</div>
+          <div class="vendor-city">📍 ${h.city}${h.state ? ', ' + h.state : ''}</div>
+        </div>
+        ${h.category ? catBadge(h.category) : ''}
+      </div>
+      ${h.contact_person ? `<div style="font-size:12px;color:var(--text3)">👤 ${h.contact_person}</div>` : ''}
+      <div class="vendor-phone">📞 ${h.phone || '—'}</div>
+      <div class="vendor-rate" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span>
+          <span class="rate-cost">Cost: ${fmtINR(h.our_rate)}</span>
+        </span>
+        <span class="rate-sell">${fmtINR(selling(h.our_rate, h.markup_percent))}<span style="font-size:11px;color:var(--text3);font-weight:400"> /night</span></span>
+      </div>
+      ${h.notes ? `<div style="font-size:11px;color:var(--text3);margin-top:8px;background:var(--bg3);padding:6px 8px;border-radius:6px">${h.notes}</div>` : ''}
+    </div>`).join('')}</div>`;
+}
+
+function viewHotel(id) {
+  const h = allHotels.find(x => x.id === id);
+  if (!h) return;
+  openModal(`🏨 ${h.name}`, `
+    <div style="display:grid;gap:12px">
+      <div class="form-row">
+        <div><div class="form-label">City</div><div>${h.city}</div></div>
+        <div><div class="form-label">State</div><div>${h.state || '—'}</div></div>
+      </div>
+      <div class="form-row">
+        <div><div class="form-label">Category</div>${h.category ? catBadge(h.category) : '—'}</div>
+        <div><div class="form-label">Status</div><span class="badge ${h.is_active ? 'badge-green' : 'badge-red'}">${h.is_active ? 'Active' : 'Inactive'}</span></div>
+      </div>
+      <div class="form-row">
+        <div><div class="form-label">Contact Person</div><div>${h.contact_person || '—'}</div></div>
+        <div><div class="form-label">Phone</div><div><a href="tel:${h.phone}" style="color:var(--saffron)">${h.phone || '—'}</a></div></div>
+      </div>
+      ${h.email ? `<div><div class="form-label">Email</div><div>${h.email}</div></div>` : ''}
+      ${h.whatsapp ? `<div><div class="form-label">WhatsApp</div><div>${h.whatsapp}</div></div>` : ''}
+      <div style="background:var(--bg3);border-radius:8px;padding:14px">
+        <div class="form-label">Pricing</div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px">
+          <div><div style="font-size:11px;color:var(--text3)">Our Cost</div><div style="font-size:18px;font-weight:700">${fmtINR(h.our_rate)}</div></div>
+          <div><div style="font-size:11px;color:var(--text3)">Markup</div><div style="font-size:18px;font-weight:700;color:var(--amber)">${h.markup_percent}%</div></div>
+          <div><div style="font-size:11px;color:var(--text3)">Sell Price</div><div style="font-size:18px;font-weight:700;color:var(--green)">${fmtINR(selling(h.our_rate, h.markup_percent))}</div></div>
+        </div>
+      </div>
+      ${h.notes ? `<div><div class="form-label">Notes</div><div style="font-size:13px;color:var(--text2)">${h.notes}</div></div>` : ''}
+    </div>`,
+    `<button class="btn btn-ghost" onclick="editHotel('${h.id}')">✏️ Edit</button>
+     <button class="btn btn-danger btn-sm" onclick="deleteHotel('${h.id}')">🗑 Delete</button>`
+  );
+}
+
+function openAddHotel(existing = null) {
+  const h = existing || {};
+  openModal(existing ? '✏️ Edit Hotel' : '🏨 Add Hotel', `
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Hotel Name *</label>
+      <input class="form-input" id="hName" value="${h.name||''}" placeholder="Hotel Sai Palace" />
+    </div><div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="hCat">
+        ${['Budget','Standard','Deluxe','Luxury','Heritage'].map(c => `<option ${h.category===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">City *</label>
+      <input class="form-input" id="hCity" value="${h.city||''}" placeholder="Shirdi" />
+    </div><div class="form-group">
+      <label class="form-label">State</label>
+      <input class="form-input" id="hState" value="${h.state||''}" placeholder="Maharashtra" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Contact Person</label>
+      <input class="form-input" id="hCP" value="${h.contact_person||''}" placeholder="Ramesh Patil" />
+    </div><div class="form-group">
+      <label class="form-label">Phone</label>
+      <input class="form-input" id="hPhone" value="${h.phone||''}" placeholder="9876543210" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="hEmail" value="${h.email||''}" placeholder="hotel@example.com" />
+    </div><div class="form-group">
+      <label class="form-label">WhatsApp</label>
+      <input class="form-input" id="hWA" value="${h.whatsapp||''}" placeholder="9876543210" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Our Cost (per night ₹)</label>
+      <input class="form-input" id="hRate" type="number" value="${h.our_rate||''}" placeholder="2500" oninput="updateMarkupPreview('h')" />
+    </div><div class="form-group">
+      <label class="form-label">Markup %</label>
+      <input class="form-input" id="hMarkup" type="number" value="${h.markup_percent||20}" oninput="updateMarkupPreview('h')" />
+    </div></div>
+    <div class="markup-display" id="hMarkupPreview"></div>
+    <div class="form-group">
+      <label class="form-label">Address</label>
+      <input class="form-input" id="hAddr" value="${h.address||''}" placeholder="Full address" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="hNotes">${h.notes||''}</textarea>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveHotel('${h.id||''}')">💾 Save Hotel</button>`
+  );
+  setTimeout(() => updateMarkupPreview('h'), 50);
+}
+
+function updateMarkupPreview(prefix) {
+  const cost = parseFloat(document.getElementById(prefix+'Rate')?.value) || 0;
+  const markup = parseFloat(document.getElementById(prefix+'Markup')?.value) || 0;
+  const sell = selling(cost, markup);
+  const el = document.getElementById(prefix+'MarkupPreview');
+  if (el && cost > 0) {
+    el.innerHTML = `Cost ${fmtINR(cost)} + ${markup}% markup = <span class="sell">${fmtINR(sell)}</span> selling price`;
+  }
+}
+
+async function saveHotel(id) {
+  const data = {
+    name: document.getElementById('hName').value.trim(),
+    category: document.getElementById('hCat').value,
+    city: document.getElementById('hCity').value.trim(),
+    state: document.getElementById('hState').value.trim(),
+    contact_person: document.getElementById('hCP').value.trim(),
+    phone: document.getElementById('hPhone').value.trim(),
+    email: document.getElementById('hEmail').value.trim(),
+    whatsapp: document.getElementById('hWA').value.trim(),
+    our_rate: parseFloat(document.getElementById('hRate').value) || null,
+    markup_percent: parseFloat(document.getElementById('hMarkup').value) || 20,
+    address: document.getElementById('hAddr').value.trim(),
+    notes: document.getElementById('hNotes').value.trim(),
+    updated_at: new Date().toISOString(),
+  };
+  if (!data.name || !data.city) { toast('Name and city are required', 'error'); return; }
+
+  let error;
+  if (id) {
+    ({ error } = await sb.from('hotels').update(data).eq('id', id));
+  } else {
+    ({ error } = await sb.from('hotels').insert(data));
+  }
+  if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+  toast(id ? 'Hotel updated!' : 'Hotel added!');
+  closeModal();
+  loadHotels();
+}
+
+function editHotel(id) {
+  closeModal();
+  const h = allHotels.find(x => x.id === id);
+  if (h) setTimeout(() => openAddHotel(h), 100);
+}
+
+async function deleteHotel(id) {
+  if (!confirm('Delete this hotel?')) return;
+  const { error } = await sb.from('hotels').delete().eq('id', id);
+  if (error) { toast('Delete failed', 'error'); return; }
+  toast('Hotel deleted');
+  closeModal();
+  loadHotels();
+}
+
+// ══════════════════════════════════════════
+// TAXIS
+// ══════════════════════════════════════════
+async function renderTaxis() {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="topbar">
+      <div><div class="page-title">🚗 Taxis & Transport</div><div class="page-sub">All your transport vendor contacts</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openAddTaxi()">+ Add Taxi</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="filter-bar">
+        <div class="search-wrap" style="flex:1;max-width:300px">
+          <span class="search-icon">🔍</span>
+          <input class="form-input" id="taxiSearch" placeholder="Search vendors, cities..." oninput="filterTaxis()" style="padding-left:36px" />
+        </div>
+      </div>
+      <div id="taxiList"><div class="loading"><div class="spinner"></div> Loading taxis...</div></div>
+    </div>`;
+  await loadTaxis();
+}
+
+let allTaxis = [];
+async function loadTaxis() {
+  const { data } = await sb.from('taxis').select('*').order('created_at', { ascending: false });
+  allTaxis = data || [];
+  filterTaxis();
+}
+
+function filterTaxis() {
+  const q = (document.getElementById('taxiSearch')?.value || '').toLowerCase();
+  const filtered = allTaxis.filter(t => !q || 
+    t.vendor_name?.toLowerCase().includes(q) || 
+    t.city?.toLowerCase().includes(q) || 
+    t.contact_person?.toLowerCase().includes(q));
+  renderTaxiList(filtered);
+}
+
+function renderTaxiList(taxis) {
+  const el = document.getElementById('taxiList');
+  if (!el) return;
+  if (taxis.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🚗</div><div class="empty-title">No taxi vendors yet</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="vendor-grid">${taxis.map(t => `
+    <div class="vendor-card" onclick="viewTaxi('${t.id}')">
+      <div class="vendor-card-top">
+        <div>
+          <div class="vendor-name">${t.vendor_name}</div>
+          <div class="vendor-city">📍 ${t.city}${t.state ? ', ' + t.state : ''}</div>
+        </div>
+        <span class="badge badge-blue">🚗</span>
+      </div>
+      <div style="font-size:12px;color:var(--text3)">👤 ${t.contact_person}</div>
+      <div class="vendor-phone">📞 ${t.phone}</div>
+      ${t.vehicle_types?.length ? `<div style="font-size:11px;color:var(--text3);margin-top:6px">${t.vehicle_types.join(' · ')}</div>` : ''}
+      <div class="vendor-rate" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span class="rate-cost">Cost: ${fmtINR(t.our_rate_per_day)}/day</span>
+        <span class="rate-sell">${fmtINR(selling(t.our_rate_per_day, t.markup_percent))}<span style="font-size:11px;color:var(--text3);font-weight:400">/day</span></span>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function viewTaxi(id) {
+  const t = allTaxis.find(x => x.id === id);
+  if (!t) return;
+  openModal(`🚗 ${t.vendor_name}`, `
+    <div style="display:grid;gap:12px">
+      <div class="form-row">
+        <div><div class="form-label">City</div><div>${t.city}</div></div>
+        <div><div class="form-label">State</div><div>${t.state || '—'}</div></div>
+      </div>
+      <div class="form-row">
+        <div><div class="form-label">Contact Person</div><div>${t.contact_person}</div></div>
+        <div><div class="form-label">Phone</div><div><a href="tel:${t.phone}" style="color:var(--saffron)">${t.phone}</a></div></div>
+      </div>
+      ${t.vehicle_types?.length ? `<div><div class="form-label">Vehicle Types</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">${t.vehicle_types.map(v=>`<span class="badge badge-blue">${v}</span>`).join('')}</div></div>` : ''}
+      <div style="background:var(--bg3);border-radius:8px;padding:14px">
+        <div class="form-label">Pricing</div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px">
+          <div><div style="font-size:11px;color:var(--text3)">Cost/Day</div><div style="font-size:18px;font-weight:700">${fmtINR(t.our_rate_per_day)}</div></div>
+          <div><div style="font-size:11px;color:var(--text3)">Markup</div><div style="font-size:18px;font-weight:700;color:var(--amber)">${t.markup_percent}%</div></div>
+          <div><div style="font-size:11px;color:var(--text3)">Sell/Day</div><div style="font-size:18px;font-weight:700;color:var(--green)">${fmtINR(selling(t.our_rate_per_day, t.markup_percent))}</div></div>
+        </div>
+      </div>
+      ${t.notes ? `<div><div class="form-label">Notes</div><div style="font-size:13px;color:var(--text2)">${t.notes}</div></div>` : ''}
+    </div>`,
+    `<button class="btn btn-ghost" onclick="editTaxi('${t.id}')">✏️ Edit</button>
+     <button class="btn btn-danger btn-sm" onclick="deleteTaxi('${t.id}')">🗑 Delete</button>`
+  );
+}
+
+function openAddTaxi(existing = null) {
+  const t = existing || {};
+  openModal(existing ? '✏️ Edit Taxi' : '🚗 Add Taxi Vendor', `
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Vendor/Company Name *</label>
+      <input class="form-input" id="tName" value="${t.vendor_name||''}" placeholder="Shree Sai Travels" />
+    </div><div class="form-group">
+      <label class="form-label">Contact Person *</label>
+      <input class="form-input" id="tCP" value="${t.contact_person||''}" placeholder="Mahesh Jadhav" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Phone *</label>
+      <input class="form-input" id="tPhone" value="${t.phone||''}" placeholder="9876543210" />
+    </div><div class="form-group">
+      <label class="form-label">WhatsApp</label>
+      <input class="form-input" id="tWA" value="${t.whatsapp||''}" placeholder="9876543210" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">City *</label>
+      <input class="form-input" id="tCity" value="${t.city||''}" placeholder="Shirdi" />
+    </div><div class="form-group">
+      <label class="form-label">State</label>
+      <input class="form-input" id="tState" value="${t.state||''}" placeholder="Maharashtra" />
+    </div></div>
+    <div class="form-group">
+      <label class="form-label">Vehicle Types (comma separated)</label>
+      <input class="form-input" id="tVehicles" value="${(t.vehicle_types||[]).join(', ')}" placeholder="Sedan, SUV, Tempo Traveller" />
+    </div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Our Rate/Day (₹)</label>
+      <input class="form-input" id="tRate" type="number" value="${t.our_rate_per_day||''}" placeholder="2800" oninput="updateMarkupPreview('t')" />
+    </div><div class="form-group">
+      <label class="form-label">Markup %</label>
+      <input class="form-input" id="tMarkup" type="number" value="${t.markup_percent||25}" oninput="updateMarkupPreview('t')" />
+    </div></div>
+    <div class="markup-display" id="tMarkupPreview"></div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="tNotes">${t.notes||''}</textarea>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveTaxi('${t.id||''}')">💾 Save Taxi</button>`
+  );
+  setTimeout(() => updateMarkupPreview('t'), 50);
+}
+
+async function saveTaxi(id) {
+  const vehicles = document.getElementById('tVehicles').value.split(',').map(v=>v.trim()).filter(Boolean);
+  const data = {
+    vendor_name: document.getElementById('tName').value.trim(),
+    contact_person: document.getElementById('tCP').value.trim(),
+    phone: document.getElementById('tPhone').value.trim(),
+    whatsapp: document.getElementById('tWA').value.trim(),
+    city: document.getElementById('tCity').value.trim(),
+    state: document.getElementById('tState').value.trim(),
+    vehicle_types: vehicles,
+    our_rate_per_day: parseFloat(document.getElementById('tRate').value) || null,
+    markup_percent: parseFloat(document.getElementById('tMarkup').value) || 25,
+    notes: document.getElementById('tNotes').value.trim(),
+    updated_at: new Date().toISOString(),
+  };
+  if (!data.vendor_name || !data.phone || !data.city) { toast('Name, phone and city required', 'error'); return; }
+  let error;
+  if (id) ({ error } = await sb.from('taxis').update(data).eq('id', id));
+  else ({ error } = await sb.from('taxis').insert(data));
+  if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+  toast(id ? 'Taxi vendor updated!' : 'Taxi vendor added!');
+  closeModal();
+  loadTaxis();
+}
+
+function editTaxi(id) {
+  closeModal();
+  const t = allTaxis.find(x => x.id === id);
+  if (t) setTimeout(() => openAddTaxi(t), 100);
+}
+
+async function deleteTaxi(id) {
+  if (!confirm('Delete this vendor?')) return;
+  await sb.from('taxis').delete().eq('id', id);
+  toast('Taxi vendor deleted');
+  closeModal();
+  loadTaxis();
+}
+
+// ══════════════════════════════════════════
+// ACTIVITIES
+// ══════════════════════════════════════════
+async function renderActivities() {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="topbar">
+      <div><div class="page-title">🎯 Activities & Experiences</div><div class="page-sub">Sightseeing, tours, and experiences</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openAddActivity()">+ Add Activity</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="filter-bar">
+        <div class="search-wrap" style="flex:1;max-width:300px">
+          <span class="search-icon">🔍</span>
+          <input class="form-input" id="actSearch" placeholder="Search activities..." oninput="filterActivities()" style="padding-left:36px" />
+        </div>
+        <select class="filter-select" id="actCat" onchange="filterActivities()">
+          <option value="">All Categories</option>
+          ${['Sightseeing','Adventure','Cultural','Religious','Food','Wellness','Shopping','Other'].map(c=>`<option>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div id="actList"><div class="loading"><div class="spinner"></div> Loading...</div></div>
+    </div>`;
+  await loadActivities();
+}
+
+let allActivities = [];
+async function loadActivities() {
+  const { data } = await sb.from('activities').select('*').order('created_at', { ascending: false });
+  allActivities = data || [];
+  filterActivities();
+}
+
+function filterActivities() {
+  const q = (document.getElementById('actSearch')?.value || '').toLowerCase();
+  const cat = document.getElementById('actCat')?.value || '';
+  const filtered = allActivities.filter(a => {
+    const matchQ = !q || a.name?.toLowerCase().includes(q) || a.city?.toLowerCase().includes(q);
+    const matchCat = !cat || a.category === cat;
+    return matchQ && matchCat;
+  });
+  renderActivityList(filtered);
+}
+
+function renderActivityList(acts) {
+  const el = document.getElementById('actList');
+  if (!el) return;
+  if (acts.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🎯</div><div class="empty-title">No activities yet</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="vendor-grid">${acts.map(a => `
+    <div class="vendor-card" onclick="viewActivity('${a.id}')">
+      <div class="vendor-card-top">
+        <div>
+          <div class="vendor-name">${a.name}</div>
+          <div class="vendor-city">📍 ${a.city}${a.state ? ', ' + a.state : ''}</div>
+        </div>
+        ${a.category ? catBadge(a.category) : ''}
+      </div>
+      ${a.duration_hours ? `<div style="font-size:12px;color:var(--text3)">⏱ ${a.duration_hours} hrs</div>` : ''}
+      ${a.description ? `<div style="font-size:12px;color:var(--text2);margin-top:6px">${a.description}</div>` : ''}
+      <div class="vendor-rate" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span class="rate-cost">Cost: ${fmtINR(a.our_cost)}</span>
+        <span class="rate-sell">${a.our_cost > 0 ? fmtINR(selling(a.our_cost, a.markup_percent)) : '<span style="color:var(--green)">Free</span>'}</span>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function openAddActivity(existing = null) {
+  const a = existing || {};
+  openModal(existing ? '✏️ Edit Activity' : '🎯 Add Activity', `
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Activity Name *</label>
+      <input class="form-input" id="aName" value="${a.name||''}" placeholder="Shirdi Darshan Tour" />
+    </div><div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="aCat">
+        ${['Sightseeing','Adventure','Cultural','Religious','Food','Wellness','Shopping','Other'].map(c=>`<option ${a.category===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">City *</label>
+      <input class="form-input" id="aCity" value="${a.city||''}" placeholder="Shirdi" />
+    </div><div class="form-group">
+      <label class="form-label">Duration (hours)</label>
+      <input class="form-input" id="aDuration" type="number" value="${a.duration_hours||''}" placeholder="3" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Contact Person</label>
+      <input class="form-input" id="aCP" value="${a.contact_person||''}" />
+    </div><div class="form-group">
+      <label class="form-label">Phone</label>
+      <input class="form-input" id="aPhone" value="${a.phone||''}" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Our Cost (₹)</label>
+      <input class="form-input" id="aRate" type="number" value="${a.our_cost||0}" oninput="updateMarkupPreview('a')" />
+    </div><div class="form-group">
+      <label class="form-label">Markup %</label>
+      <input class="form-input" id="aMarkup" type="number" value="${a.markup_percent||30}" oninput="updateMarkupPreview('a')" />
+    </div></div>
+    <div class="markup-display" id="aMarkupPreview"></div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="aDesc">${a.description||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="aNotes">${a.notes||''}</textarea>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveActivity('${a.id||''}')">💾 Save Activity</button>`
+  );
+  setTimeout(() => updateMarkupPreview('a'), 50);
+}
+
+function viewActivity(id) {
+  const a = allActivities.find(x => x.id === id);
+  if (!a) return;
+  openModal(`🎯 ${a.name}`, `
+    <div style="display:grid;gap:12px">
+      <div class="form-row">
+        <div><div class="form-label">City</div><div>${a.city}</div></div>
+        <div><div class="form-label">Category</div>${a.category ? catBadge(a.category) : '—'}</div>
+      </div>
+      ${a.duration_hours ? `<div><div class="form-label">Duration</div><div>⏱ ${a.duration_hours} hours</div></div>` : ''}
+      ${a.description ? `<div><div class="form-label">Description</div><div style="font-size:13px;color:var(--text2)">${a.description}</div></div>` : ''}
+      <div style="background:var(--bg3);border-radius:8px;padding:14px">
+        <div class="form-label">Pricing</div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px">
+          <div><div style="font-size:11px;color:var(--text3)">Our Cost</div><div style="font-size:18px;font-weight:700">${fmtINR(a.our_cost)}</div></div>
+          <div><div style="font-size:11px;color:var(--text3)">Markup</div><div style="font-size:18px;font-weight:700;color:var(--amber)">${a.markup_percent}%</div></div>
+          <div><div style="font-size:11px;color:var(--text3)">Sell Price</div><div style="font-size:18px;font-weight:700;color:var(--green)">${fmtINR(selling(a.our_cost, a.markup_percent))}</div></div>
+        </div>
+      </div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="editActivity('${a.id}')">✏️ Edit</button>
+     <button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">🗑 Delete</button>`
+  );
+}
+
+async function saveActivity(id) {
+  const data = {
+    name: document.getElementById('aName').value.trim(),
+    category: document.getElementById('aCat').value,
+    city: document.getElementById('aCity').value.trim(),
+    duration_hours: parseFloat(document.getElementById('aDuration').value) || null,
+    contact_person: document.getElementById('aCP').value.trim(),
+    phone: document.getElementById('aPhone').value.trim(),
+    our_cost: parseFloat(document.getElementById('aRate').value) || 0,
+    markup_percent: parseFloat(document.getElementById('aMarkup').value) || 30,
+    description: document.getElementById('aDesc').value.trim(),
+    notes: document.getElementById('aNotes').value.trim(),
+    updated_at: new Date().toISOString(),
+  };
+  if (!data.name || !data.city) { toast('Name and city required', 'error'); return; }
+  let error;
+  if (id) ({ error } = await sb.from('activities').update(data).eq('id', id));
+  else ({ error } = await sb.from('activities').insert(data));
+  if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+  toast(id ? 'Activity updated!' : 'Activity added!');
+  closeModal();
+  loadActivities();
+}
+
+function editActivity(id) {
+  closeModal();
+  const a = allActivities.find(x => x.id === id);
+  if (a) setTimeout(() => openAddActivity(a), 100);
+}
+
+async function deleteActivity(id) {
+  if (!confirm('Delete this activity?')) return;
+  await sb.from('activities').delete().eq('id', id);
+  toast('Activity deleted');
+  closeModal();
+  loadActivities();
+}
+
+// ══════════════════════════════════════════
+// ITINERARIES LIST
+// ══════════════════════════════════════════
+async function renderItineraries() {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="topbar">
+      <div><div class="page-title">🗺️ Itineraries</div><div class="page-sub">All client trip packages</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openAddItinerary()">+ New Itinerary</button>
+      </div>
+    </div>
+    <div class="content">
+      <div id="itinList"><div class="loading"><div class="spinner"></div> Loading...</div></div>
+    </div>`;
+  await loadItineraries();
+}
+
+let allItineraries = [];
+async function loadItineraries() {
+  const { data } = await sb.from('itineraries').select('*').order('created_at', { ascending: false });
+  allItineraries = data || [];
+  renderItineraryList(allItineraries);
+}
+
+function renderItineraryList(itins) {
+  const el = document.getElementById('itinList');
+  if (!el) return;
+  if (itins.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🗺️</div><div class="empty-title">No itineraries yet</div><div class="empty-sub">Create your first client package</div></div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="card table-wrap">
+      <table>
+        <thead><tr>
+          <th>Client</th><th>Destination</th><th>Dates</th><th>Pax</th><th>Status</th><th>Selling Price</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${itins.map(i => `<tr>
+            <td>
+              <div style="font-weight:500">${i.client_name}</div>
+              ${i.client_phone ? `<div style="font-size:11px;color:var(--text3)">${i.client_phone}</div>` : ''}
+            </td>
+            <td>${i.destination || '—'}</td>
+            <td style="font-size:12px;color:var(--text2)">${i.start_date ? i.start_date + ' → ' + (i.end_date||'?') : '—'}</td>
+            <td style="text-align:center">${i.num_pax || '—'}</td>
+            <td><span class="badge badge-${i.status==='Confirmed'?'green':i.status==='Sent'?'blue':i.status==='Cancelled'?'red':'blue'}">${i.status}</span></td>
+            <td style="font-weight:600;color:var(--green)">${fmtINR(i.total_selling)}</td>
+            <td>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-ghost btn-sm" onclick="openBuilder('${i.id}')">✏️ Build</button>
+                <button class="btn btn-ghost btn-sm" onclick="printItinerary('${i.id}')">🖨️</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteItinerary('${i.id}')">🗑</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function openAddItinerary() {
+  openModal('🗺️ New Itinerary', `
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Client Name *</label>
+      <input class="form-input" id="iClient" placeholder="Mr. Sharma" />
+    </div><div class="form-group">
+      <label class="form-label">Client Phone</label>
+      <input class="form-input" id="iPhone" placeholder="9876543210" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Client Email</label>
+      <input class="form-input" id="iEmail" placeholder="client@email.com" />
+    </div><div class="form-group">
+      <label class="form-label">Destination</label>
+      <input class="form-input" id="iDest" placeholder="Shirdi - Nashik - Pune" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Start Date</label>
+      <input class="form-input" id="iStart" type="date" />
+    </div><div class="form-group">
+      <label class="form-label">End Date</label>
+      <input class="form-input" id="iEnd" type="date" />
+    </div></div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">No. of Pax</label>
+      <input class="form-input" id="iPax" type="number" value="2" min="1" />
+    </div><div class="form-group">
+      <label class="form-label">Created By</label>
+      <input class="form-input" id="iBy" placeholder="Your name" />
+    </div></div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="iNotes"></textarea>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveItinerary()">Create & Build →</button>`
+  );
+}
+
+async function saveItinerary() {
+  const client = document.getElementById('iClient').value.trim();
+  if (!client) { toast('Client name required', 'error'); return; }
+  const start = document.getElementById('iStart').value;
+  const end = document.getElementById('iEnd').value;
+  let numDays = 1;
+  if (start && end) {
+    numDays = Math.max(1, Math.ceil((new Date(end) - new Date(start)) / 86400000));
+  }
+  const data = {
+    client_name: client,
+    client_phone: document.getElementById('iPhone').value.trim(),
+    client_email: document.getElementById('iEmail').value.trim(),
+    destination: document.getElementById('iDest').value.trim(),
+    start_date: start || null,
+    end_date: end || null,
+    num_pax: parseInt(document.getElementById('iPax').value) || 2,
+    created_by: document.getElementById('iBy').value.trim(),
+    notes: document.getElementById('iNotes').value.trim(),
+    status: 'Draft',
+  };
+  const { data: itin, error } = await sb.from('itineraries').insert(data).select().single();
+  if (error) { toast('Failed: ' + error.message, 'error'); return; }
+  
+  // Create day rows
+  const days = [];
+  for (let d = 0; d < numDays; d++) {
+    let date = null;
+    if (start) {
+      const dt = new Date(start);
+      dt.setDate(dt.getDate() + d);
+      date = dt.toISOString().split('T')[0];
+    }
+    days.push({ itinerary_id: itin.id, day_number: d + 1, date, title: `Day ${d+1}` });
+  }
+  await sb.from('itinerary_days').insert(days);
+  
+  toast('Itinerary created!');
+  closeModal();
+  openBuilder(itin.id);
+}
+
+async function deleteItinerary(id) {
+  if (!confirm('Delete this itinerary?')) return;
+  await sb.from('itineraries').delete().eq('id', id);
+  toast('Itinerary deleted');
+  loadItineraries();
+}
+
+// ══════════════════════════════════════════
+// ITINERARY BUILDER
+// ══════════════════════════════════════════
+let builderData = { itinerary: null, days: [], items: {} };
+let allVendors = { hotels: [], taxis: [], activities: [] };
+
+async function renderBuilder(itinId = null) {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="topbar">
+      <div><div class="page-title">✏️ Itinerary Builder</div><div class="page-sub" id="builderSub">Select or create an itinerary</div></div>
+      <div class="topbar-actions" id="builderActions"></div>
+    </div>
+    <div class="content" id="builderContent">
+      <div class="loading"><div class="spinner"></div> Loading...</div>
+    </div>`;
+
+  // load all vendors for drag panel
+  const [hotels, taxis, activities] = await Promise.all([
+    sb.from('hotels').select('*').eq('is_active', true).then(r => r.data || []),
+    sb.from('taxis').select('*').eq('is_active', true).then(r => r.data || []),
+    sb.from('activities').select('*').eq('is_active', true).then(r => r.data || []),
+  ]);
+  allVendors = { hotels, taxis, activities };
+
+  if (itinId) {
+    await loadBuilderItinerary(itinId);
+  } else {
+    // show picker
+    const { data: itins } = await sb.from('itineraries').select('*').neq('status','Cancelled').order('created_at', { ascending: false });
+    if (!itins || itins.length === 0) {
+      document.getElementById('builderContent').innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">🗺️</div>
+          <div class="empty-title">No itineraries yet</div>
+          <div class="empty-sub">Create one first from the Itineraries section</div>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="navigate('itineraries');setTimeout(openAddItinerary,100)">Create Itinerary</button>
+        </div>`;
+      return;
+    }
+    document.getElementById('builderContent').innerHTML = `
+      <div style="max-width:600px">
+        <div style="font-size:14px;color:var(--text2);margin-bottom:14px">Select an itinerary to build:</div>
+        ${itins.map(i => `
+          <div class="vendor-card" style="margin-bottom:10px" onclick="loadBuilderItinerary('${i.id}')">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="vendor-name">${i.client_name}</div>
+                <div class="vendor-city">${i.destination || 'No destination'} · ${i.start_date || 'No date'}</div>
+              </div>
+              <span class="badge badge-${i.status==='Confirmed'?'green':i.status==='Sent'?'blue':'blue'}">${i.status}</span>
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+}
+
+async function openBuilder(id) {
+  navigate('builder');
+  setTimeout(() => loadBuilderItinerary(id), 100);
+}
+
+async function loadBuilderItinerary(id) {
+  const { data: itin } = await sb.from('itineraries').select('*').eq('id', id).single();
+  const { data: days } = await sb.from('itinerary_days').select('*').eq('itinerary_id', id).order('day_number');
+  const items = {};
+  for (const day of (days || [])) {
+    const { data: dayItems } = await sb.from('itinerary_items').select('*').eq('day_id', day.id).order('sort_order');
+    items[day.id] = dayItems || [];
+  }
+  builderData = { itinerary: itin, days: days || [], items };
+  currentItinerary = itin;
+
+  document.getElementById('builderSub').textContent = `${itin.client_name} · ${itin.destination || ''} · ${itin.num_pax} pax`;
+  document.getElementById('builderActions').innerHTML = `
+    <select class="filter-select" onchange="updateItinStatus('${itin.id}',this.value)">
+      ${['Draft','Sent','Confirmed','Cancelled'].map(s=>`<option ${itin.status===s?'selected':''}>${s}</option>`).join('')}
+    </select>
+    <button class="btn btn-ghost" onclick="printItinerary('${itin.id}')">🖨️ Print</button>
+    <button class="btn btn-primary" onclick="addDayToBuilder('${itin.id}')">+ Add Day</button>`;
+
+  renderBuilderUI();
+}
+
+function renderBuilderUI() {
+  const { itinerary: itin, days, items } = builderData;
+  const totalCost = Object.values(items).flat().reduce((s, i) => s + (i.our_cost || 0), 0);
+  const totalSell = Object.values(items).flat().reduce((s, i) => s + (i.selling_price || 0), 0);
+
+  document.getElementById('builderContent').innerHTML = `
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="stat-card" style="flex:1;min-width:150px">
+        <div class="stat-label">Our Cost</div>
+        <div class="stat-value" style="font-size:20px">${fmtINR(totalCost)}</div>
+      </div>
+      <div class="stat-card" style="flex:1;min-width:150px">
+        <div class="stat-label">Selling Price</div>
+        <div class="stat-value" style="font-size:20px;color:var(--green)">${fmtINR(totalSell)}</div>
+      </div>
+      <div class="stat-card" style="flex:1;min-width:150px">
+        <div class="stat-label">Profit</div>
+        <div class="stat-value" style="font-size:20px;color:var(--amber)">${fmtINR(totalSell - totalCost)}</div>
+      </div>
+    </div>
+    <div class="builder-layout">
+      <div id="daysList">
+        ${days.length === 0 ? `<div class="empty"><div class="empty-icon">📅</div><div class="empty-title">No days yet</div><button class="btn btn-primary" onclick="addDayToBuilder('${itin.id}')">Add First Day</button></div>` :
+          days.map(day => `
+            <div class="itin-day" id="day-${day.id}">
+              <div class="itin-day-header">
+                <div>
+                  <span class="day-label">Day ${day.day_number}</span>
+                  ${day.date ? `<span style="font-size:11px;color:var(--text3);margin-left:8px">${day.date}</span>` : ''}
+                  <input class="form-input" value="${day.title||''}" style="width:180px;margin-left:10px;padding:4px 8px;font-size:12px" 
+                    onchange="updateDayTitle('${day.id}',this.value)" placeholder="Day title..." />
+                </div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-ghost btn-sm" onclick="addCustomItem('${day.id}')">+ Note</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteDay('${day.id}')">🗑</button>
+                </div>
+              </div>
+              <div class="itin-drop-zone" id="zone-${day.id}" 
+                ondragover="event.preventDefault();document.getElementById('zone-${day.id}').classList.add('drag-over')"
+                ondragleave="document.getElementById('zone-${day.id}').classList.remove('drag-over')"
+                ondrop="handleDrop(event,'${day.id}')">
+                ${(items[day.id] || []).length === 0 ? 
+                  '<div class="drop-hint">← Drag hotels, taxis, or activities here</div>' :
+                  (items[day.id] || []).map(item => renderItinItem(item, day.id)).join('')
+                }
+              </div>
+            </div>`).join('')}
+      </div>
+      
+      <!-- VENDOR PANEL -->
+      <div class="vendor-panel">
+        <div class="vendor-panel-header">🏨 Hotels</div>
+        ${allVendors.hotels.length === 0 ? '<div style="padding:12px;font-size:12px;color:var(--text3)">No hotels added yet</div>' :
+          allVendors.hotels.map(h => `
+            <div class="draggable-vendor" draggable="true" 
+              ondragstart="dragVendor(event,'hotel','${h.id}','${h.name.replace(/'/g,"\\'")}',${h.our_rate||0},${h.markup_percent||20})">
+              <span class="dv-icon">🏨</span>
+              <div class="dv-info">
+                <div class="dv-name">${h.name}</div>
+                <div class="dv-sub">${h.city} · ${fmtINR(selling(h.our_rate,h.markup_percent))}/night</div>
+              </div>
+            </div>`).join('')}
+        
+        <div class="vendor-panel-header">🚗 Taxis</div>
+        ${allVendors.taxis.length === 0 ? '<div style="padding:12px;font-size:12px;color:var(--text3)">No taxis added yet</div>' :
+          allVendors.taxis.map(t => `
+            <div class="draggable-vendor" draggable="true"
+              ondragstart="dragVendor(event,'taxi','${t.id}','${t.vendor_name.replace(/'/g,"\\'")}',${t.our_rate_per_day||0},${t.markup_percent||25})">
+              <span class="dv-icon">🚗</span>
+              <div class="dv-info">
+                <div class="dv-name">${t.vendor_name}</div>
+                <div class="dv-sub">${t.city} · ${fmtINR(selling(t.our_rate_per_day,t.markup_percent))}/day</div>
+              </div>
+            </div>`).join('')}
+        
+        <div class="vendor-panel-header">🎯 Activities</div>
+        ${allVendors.activities.length === 0 ? '<div style="padding:12px;font-size:12px;color:var(--text3)">No activities yet</div>' :
+          allVendors.activities.map(a => `
+            <div class="draggable-vendor" draggable="true"
+              ondragstart="dragVendor(event,'activity','${a.id}','${a.name.replace(/'/g,"\\'")}',${a.our_cost||0},${a.markup_percent||30})">
+              <span class="dv-icon">🎯</span>
+              <div class="dv-info">
+                <div class="dv-name">${a.name}</div>
+                <div class="dv-sub">${a.city} · ${a.our_cost > 0 ? fmtINR(selling(a.our_cost,a.markup_percent)) : 'Free'}</div>
+              </div>
+            </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderItinItem(item, dayId) {
+  const icons = { hotel: '🏨', taxi: '🚗', activity: '🎯', note: '📝', meal: '🍽️', flight: '✈️' };
+  return `<div class="itin-item" draggable="true" id="item-${item.id}">
+    <span class="item-icon">${icons[item.item_type] || '📌'}</span>
+    <div class="item-info">
+      <div class="item-name">${item.custom_title || '—'}</div>
+      <div class="item-detail">${item.item_type} ${item.our_cost > 0 ? '· cost ' + fmtINR(item.our_cost) : ''}</div>
+    </div>
+    <div class="item-price">${item.selling_price > 0 ? fmtINR(item.selling_price) : ''}</div>
+    <span class="item-remove" onclick="removeItem('${item.id}','${dayId}')">✕</span>
+  </div>`;
+}
+
+function dragVendor(event, type, id, name, cost, markup) {
+  draggedVendor = { type, id, name, cost, markup };
+  event.dataTransfer.effectAllowed = 'copy';
+}
+
+async function handleDrop(event, dayId) {
+  event.preventDefault();
+  document.getElementById('zone-' + dayId)?.classList.remove('drag-over');
+  if (!draggedVendor) return;
+  
+  const { type, id, name, cost, markup } = draggedVendor;
+  const sell = selling(cost, markup);
+  const pax = builderData.itinerary?.num_pax || 1;
+  
+  const newItem = {
+    day_id: dayId,
+    item_type: type,
+    vendor_id: id,
+    custom_title: name,
+    our_cost: cost,
+    markup_percent: markup,
+    selling_price: sell,
+    num_pax: pax,
+    sort_order: (builderData.items[dayId] || []).length,
+  };
+  
+  const { data, error } = await sb.from('itinerary_items').insert(newItem).select().single();
+  if (error) { toast('Failed to add item', 'error'); return; }
+  
+  if (!builderData.items[dayId]) builderData.items[dayId] = [];
+  builderData.items[dayId].push(data);
+  
+  // Update totals on itinerary
+  await recalcTotals();
+  renderBuilderUI();
+  draggedVendor = null;
+  toast(`${name} added to day!`);
+}
+
+async function removeItem(itemId, dayId) {
+  await sb.from('itinerary_items').delete().eq('id', itemId);
+  builderData.items[dayId] = (builderData.items[dayId] || []).filter(i => i.id !== itemId);
+  await recalcTotals();
+  renderBuilderUI();
+}
+
+async function recalcTotals() {
+  const totalCost = Object.values(builderData.items).flat().reduce((s, i) => s + (i.our_cost || 0), 0);
+  const totalSell = Object.values(builderData.items).flat().reduce((s, i) => s + (i.selling_price || 0), 0);
+  await sb.from('itineraries').update({ total_cost: totalCost, total_selling: totalSell }).eq('id', builderData.itinerary.id);
+}
+
+async function addDayToBuilder(itinId) {
+  const dayNum = builderData.days.length + 1;
+  let date = null;
+  if (builderData.itinerary?.start_date) {
+    const dt = new Date(builderData.itinerary.start_date);
+    dt.setDate(dt.getDate() + dayNum - 1);
+    date = dt.toISOString().split('T')[0];
+  }
+  const { data, error } = await sb.from('itinerary_days').insert({ itinerary_id: itinId, day_number: dayNum, date, title: `Day ${dayNum}` }).select().single();
+  if (error) { toast('Failed to add day', 'error'); return; }
+  builderData.days.push(data);
+  builderData.items[data.id] = [];
+  renderBuilderUI();
+}
+
+async function deleteDay(dayId) {
+  if (!confirm('Delete this day and all its items?')) return;
+  await sb.from('itinerary_days').delete().eq('id', dayId);
+  builderData.days = builderData.days.filter(d => d.id !== dayId);
+  delete builderData.items[dayId];
+  await recalcTotals();
+  renderBuilderUI();
+}
+
+async function updateDayTitle(dayId, title) {
+  await sb.from('itinerary_days').update({ title }).eq('id', dayId);
+  const day = builderData.days.find(d => d.id === dayId);
+  if (day) day.title = title;
+}
+
+async function addCustomItem(dayId) {
+  const note = prompt('Enter a note or custom item:');
+  if (!note) return;
+  const { data } = await sb.from('itinerary_items').insert({
+    day_id: dayId, item_type: 'note', custom_title: note, our_cost: 0, selling_price: 0, sort_order: (builderData.items[dayId]||[]).length
+  }).select().single();
+  if (!builderData.items[dayId]) builderData.items[dayId] = [];
+  builderData.items[dayId].push(data);
+  renderBuilderUI();
+}
+
+async function updateItinStatus(id, status) {
+  await sb.from('itineraries').update({ status }).eq('id', id);
+  toast('Status updated to ' + status);
+}
+
+// ══════════════════════════════════════════
+// MARKUP RULES
+// ══════════════════════════════════════════
+async function renderMarkup() {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="topbar">
+      <div><div class="page-title">💰 Markup Rules</div><div class="page-sub">Standard margins for each vendor type</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openAddMarkup()">+ Add Rule</button>
+      </div>
+    </div>
+    <div class="content" id="markupContent"><div class="loading"><div class="spinner"></div></div></div>`;
+  await loadMarkup();
+}
+
+let allMarkup = [];
+async function loadMarkup() {
+  const { data } = await sb.from('markup_rules').select('*').order('created_at');
+  allMarkup = data || [];
+  const el = document.getElementById('markupContent');
+  if (!el) return;
+  if (allMarkup.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">💰</div><div class="empty-title">No markup rules yet</div></div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Rule Name</th><th>Applies To</th><th>Markup %</th><th>Selling = Cost +</th><th>Default</th><th></th></tr></thead>
+        <tbody>
+          ${allMarkup.map(r => `<tr>
+            <td style="font-weight:500">${r.rule_name}</td>
+            <td>${r.vendor_type ? `<span class="badge badge-blue">${r.vendor_type}</span>` : 'All'}</td>
+            <td style="font-size:16px;font-weight:700;color:var(--amber)">${r.markup_percent}%</td>
+            <td style="color:var(--text3);font-size:13px">e.g. ₹1,000 cost → ₹${(1000*(1+r.markup_percent/100)).toFixed(0)} sell</td>
+            <td>${r.is_default ? '<span class="badge badge-green">Default</span>' : ''}</td>
+            <td>
+              <button class="btn btn-ghost btn-sm" onclick="editMarkup('${r.id}')">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteMarkup('${r.id}')">🗑</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px">💡 How markup works</div>
+      <div style="font-size:13px;color:var(--text2);display:grid;gap:8px">
+        <div>• <strong>Our Cost</strong> = what vendor charges us</div>
+        <div>• <strong>Markup %</strong> = our profit margin added on top</div>
+        <div>• <strong>Selling Price</strong> = Cost × (1 + Markup/100)</div>
+        <div>• Example: Hotel costs ₹2,500 with 20% markup → sell at ₹3,000</div>
+      </div>
+    </div>`;
+}
+
+function openAddMarkup(existing = null) {
+  const r = existing || {};
+  openModal(existing ? '✏️ Edit Rule' : '💰 Add Markup Rule', `
+    <div class="form-group">
+      <label class="form-label">Rule Name *</label>
+      <input class="form-input" id="mName" value="${r.rule_name||''}" placeholder="Default Hotel Markup" />
+    </div>
+    <div class="form-row"><div class="form-group">
+      <label class="form-label">Applies To</label>
+      <select class="form-select" id="mType">
+        <option value="all" ${r.vendor_type==='all'?'selected':''}>All vendors</option>
+        <option value="hotel" ${r.vendor_type==='hotel'?'selected':''}>Hotels</option>
+        <option value="taxi" ${r.vendor_type==='taxi'?'selected':''}>Taxis</option>
+        <option value="activity" ${r.vendor_type==='activity'?'selected':''}>Activities</option>
+      </select>
+    </div><div class="form-group">
+      <label class="form-label">Markup %</label>
+      <input class="form-input" id="mPct" type="number" value="${r.markup_percent||20}" oninput="updateMarkupPreview('m')" />
+    </div></div>
+    <div class="markup-display" id="mMarkupPreview"></div>
+    <div class="form-group" style="margin-top:12px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+        <input type="checkbox" id="mDefault" ${r.is_default?'checked':''} /> Set as default for this type
+      </label>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveMarkup('${r.id||''}')">💾 Save Rule</button>`
+  );
+  setTimeout(() => {
+    const el = document.getElementById('mMarkupPreview');
+    if (el) {
+      const pct = r.markup_percent || 20;
+      el.innerHTML = `₹1,000 cost + ${pct}% = <span class="sell">${fmtINR(1000*(1+pct/100))}</span> selling price`;
+    }
+  }, 50);
+}
+
+function editMarkup(id) {
+  const r = allMarkup.find(x => x.id === id);
+  if (r) openAddMarkup(r);
+}
+
+async function saveMarkup(id) {
+  const data = {
+    rule_name: document.getElementById('mName').value.trim(),
+    vendor_type: document.getElementById('mType').value,
+    markup_percent: parseFloat(document.getElementById('mPct').value) || 20,
+    is_default: document.getElementById('mDefault').checked,
+  };
+  if (!data.rule_name) { toast('Rule name required', 'error'); return; }
+  let error;
+  if (id) ({ error } = await sb.from('markup_rules').update(data).eq('id', id));
+  else ({ error } = await sb.from('markup_rules').insert(data));
+  if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+  toast('Markup rule saved!');
+  closeModal();
+  loadMarkup();
+}
+
+async function deleteMarkup(id) {
+  if (!confirm('Delete this rule?')) return;
+  await sb.from('markup_rules').delete().eq('id', id);
+  toast('Rule deleted');
+  loadMarkup();
+}
+
+// ══════════════════════════════════════════
+// PRINT ITINERARY
+// ══════════════════════════════════════════
+async function printItinerary(id) {
+  const { data: itin } = await sb.from('itineraries').select('*').eq('id', id).single();
+  const { data: days } = await sb.from('itinerary_days').select('*').eq('itinerary_id', id).order('day_number');
+  
+  let allItems = [];
+  for (const day of (days || [])) {
+    const { data: items } = await sb.from('itinerary_items').select('*').eq('day_id', day.id).order('sort_order');
+    allItems.push({ day, items: items || [] });
+  }
+
+  const icons = { hotel: '🏨', taxi: '🚗', activity: '🎯', note: '📝', meal: '🍽️', flight: '✈️' };
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <title>Itinerary - ${itin.client_name}</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: 'Georgia', serif; color: #1a1a1a; background: white; }
+      .page { max-width: 800px; margin: 0 auto; padding: 40px; }
+      .header { text-align: center; border-bottom: 3px solid #f97316; padding-bottom: 24px; margin-bottom: 32px; }
+      .brand { font-size: 28px; font-weight: 700; color: #f97316; letter-spacing: 1px; }
+      .brand-sub { font-size: 12px; color: #888; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+      .itin-title { font-size: 22px; font-weight: 700; margin-top: 20px; }
+      .meta { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 32px; padding: 20px; background: #fef3e8; border-radius: 8px; }
+      .meta-item { }
+      .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 4px; }
+      .meta-value { font-size: 15px; font-weight: 600; }
+      .day-block { margin-bottom: 28px; }
+      .day-header { background: #f97316; color: white; padding: 10px 16px; border-radius: 6px 6px 0 0; display: flex; justify-content: space-between; }
+      .day-label { font-weight: 700; font-size: 14px; }
+      .day-date { font-size: 12px; opacity: 0.85; }
+      .day-title { font-size: 13px; opacity: 0.9; }
+      .day-items { border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 6px 6px; }
+      .item { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; display: flex; gap: 12px; align-items: flex-start; }
+      .item:last-child { border-bottom: none; }
+      .item-icon { font-size: 18px; }
+      .item-name { font-weight: 600; font-size: 14px; }
+      .item-price { margin-left: auto; font-weight: 700; color: #16a34a; white-space: nowrap; }
+      .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #888; font-size: 12px; }
+      .total-box { background: #f0fdf4; border: 2px solid #16a34a; border-radius: 8px; padding: 16px 24px; margin-top: 24px; display: flex; justify-content: space-between; align-items: center; }
+      .total-label { font-size: 14px; color: #555; }
+      .total-value { font-size: 24px; font-weight: 700; color: #16a34a; }
+      @media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+    </style>
+  </head><body><div class="page">
+    <div class="header">
+      <div class="brand">🕉️ SAIBABA TRAVELS</div>
+      <div class="brand-sub">Your Trusted Journey Partner</div>
+      <div class="itin-title">Travel Itinerary</div>
+    </div>
+    <div class="meta">
+      <div class="meta-item"><div class="meta-label">Prepared For</div><div class="meta-value">${itin.client_name}</div></div>
+      <div class="meta-item"><div class="meta-label">Destination</div><div class="meta-value">${itin.destination || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Travel Dates</div><div class="meta-value">${itin.start_date || '—'} to ${itin.end_date || '—'}</div></div>
+      <div class="meta-item"><div class="meta-label">Travellers</div><div class="meta-value">${itin.num_pax} Pax</div></div>
+      <div class="meta-item"><div class="meta-label">Reference No.</div><div class="meta-value">${itin.id.slice(0,8).toUpperCase()}</div></div>
+      <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">${itin.status}</div></div>
+    </div>
+    ${allItems.map(({ day, items }) => `
+      <div class="day-block">
+        <div class="day-header">
+          <div>
+            <span class="day-label">Day ${day.day_number}</span>
+            ${day.title && day.title !== 'Day '+day.day_number ? `<span class="day-title"> — ${day.title}</span>` : ''}
+          </div>
+          ${day.date ? `<span class="day-date">${day.date}</span>` : ''}
+        </div>
+        <div class="day-items">
+          ${items.length === 0 ? '<div class="item" style="color:#aaa;font-size:13px">No items for this day</div>' :
+            items.map(item => `
+              <div class="item">
+                <span class="item-icon">${icons[item.item_type]||'📌'}</span>
+                <div>
+                  <div class="item-name">${item.custom_title || '—'}</div>
+                  ${item.custom_description ? `<div style="font-size:12px;color:#666;margin-top:2px">${item.custom_description}</div>` : ''}
+                </div>
+                ${item.selling_price > 0 ? `<div class="item-price">₹${Number(item.selling_price).toLocaleString('en-IN')}</div>` : ''}
+              </div>`).join('')}
+        </div>
+      </div>`).join('')}
+    ${itin.total_selling > 0 ? `
+      <div class="total-box">
+        <div><div class="total-label">Total Package Price</div><div style="font-size:12px;color:#888">Inclusive of all taxes & service charges</div></div>
+        <div class="total-value">₹${Number(itin.total_selling).toLocaleString('en-IN')}</div>
+      </div>` : ''}
+    ${itin.notes ? `<div style="margin-top:20px;padding:14px;background:#fef9ec;border-radius:8px;font-size:13px;color:#555"><strong>Notes:</strong> ${itin.notes}</div>` : ''}
+    <div class="footer">
+      <div>Thank you for choosing Saibaba Travels</div>
+      <div style="margin-top:4px">This itinerary is subject to availability and confirmation.</div>
+    </div>
+  </div></body></html>`);
+  win.document.close();
+  setTimeout(() => win.print(), 500);
+}
+
+// ══════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
